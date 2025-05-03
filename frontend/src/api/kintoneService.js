@@ -2,9 +2,14 @@ import axios from "axios";
 
 const API_BASE_URL = "http://localhost:3001/api/kintone"; // your proxy prefix
 
-export const getRecord = async (appId, recordId) => {
+export const getRecord = async (appId, stockID) => {
   const response = await axios.get(`${API_BASE_URL}/record`, {
-    params: { app: appId, id: recordId },
+    params: {
+      app: appId,
+      // query: `stockID = "${stockID}"` ,
+
+      query: `stockID="S1245"`,
+    },
   });
   return response.data;
 };
