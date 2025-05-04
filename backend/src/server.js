@@ -20,11 +20,11 @@ const headers = {
 
 // GET - Read a record based on a query (e.g., stockId = "S1245")
 app.get("/api/kintone/record", async (req, res) => {
-  const { app, stockid } = req.query;
+  const { app, stockID } = req.query;
 
   try {
     // Ensure that the query string is correctly formatted for Kintone
-    const queryString = `stockid="${stockid}"`; // Using quotes for exact match in Kintone query
+    const queryString = `stockID="${stockID}"`; // Using quotes for exact match in Kintone query
 
     const response = await axios.get(`${KINTONE_DOMAIN}/k/v1/records.json`, {
       headers, // Assuming `headers` contains the necessary authorization
@@ -36,12 +36,13 @@ app.get("/api/kintone/record", async (req, res) => {
 
     // If records are returned, send them as a response
     if (response.data.records && response.data.records.length > 0) {
+      console.log(response);
       res.json({
         status: "success",
-        data: response.data.records,
+        data: response.data.records, //get the first
       });
     } else {
-      res.status(404).json({
+      res.status(303).json({
         status: "error",
         message: "No records found",
       });
