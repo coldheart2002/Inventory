@@ -86,10 +86,10 @@ const WithdrawStocks = () => {
     }));
 
     console.log("📝 Records to Submit:", JSON.stringify(records, null, 2));
-    console.log(
-      "📝 Processed Submit Data:",
-      JSON.stringify(dataToSubmit, null, 2)
-    );
+    // console.log(
+    //   "📝 Processed Submit Data:",
+    //   JSON.stringify(dataToSubmit, null, 2)
+    // );
   };
 
   const totalPayment = records.reduce((sum, rec) => sum + rec.paymentPrice, 0);
@@ -204,7 +204,7 @@ const WithdrawStocks = () => {
               color: "white",
             }}
           >
-            📝 Submit
+            📝 Withdraw
           </button>
         </div>
       )}

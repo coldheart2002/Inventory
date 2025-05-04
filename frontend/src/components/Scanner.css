@@ -1,0 +1,16 @@
+/* Make the reader take full width and height up to max */
+#reader {
+  width: 100% !important;
+  max-width: 600px;
+  height: auto !important;
+  margin: 0 auto;
+  border-radius: 10px;
+}
+
+/* Force video inside scanner to fill the container */
+#reader video {
+  width: 100% !important;
+  height: auto !important;
+  object-fit: cover;
+  border-radius: 10px;
+}

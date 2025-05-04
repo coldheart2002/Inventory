@@ -5,7 +5,7 @@ import {
   Route,
   useNavigate,
 } from "react-router-dom";
-// import "./App.css";
+import "./App.css";
 import AddStocks from "./pages/AddStocks";
 import WithdrawStocks from "./pages/WithdrawStocks";
 import ViewStocks from "./pages/ViewStocks";

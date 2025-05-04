@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Html5QrcodeScanner } from "html5-qrcode";
+import "./Scanner.css"; // Import your CSS
 
 const Scanner = ({ onScan }) => {
   const [scanResult, setScanResult] = useState(null);
 
   useEffect(() => {
     const scanner = new Html5QrcodeScanner("reader", {
-      qrbox: { width: 250, height: 250 }, // Increased scanner box size
+      qrbox: { width: 250, height: 250 },
       fps: 10,
     });
 
@@ -15,7 +16,7 @@ const Scanner = ({ onScan }) => {
         scanner.clear().then(() => {
           console.log("✅ Scan result:", result);
           setScanResult(result);
-          if (onScan) onScan(result); // Notify parent
+          if (onScan) onScan(result);
         });
       },
       (error) => {
@@ -31,11 +32,9 @@ const Scanner = ({ onScan }) => {
   }, [onScan]);
 
   return (
-    <div
-      style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}
-    >
+    <div className="scanner-container">
       {scanResult ? (
-        <div>Result: {scanResult}</div>
+        <div className="scan-result">Result: {scanResult}</div>
       ) : (
         <div id="reader" style={{ width: "100%", maxWidth: "500px" }}></div>
       )}
