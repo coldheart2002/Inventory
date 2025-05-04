@@ -1,31 +1,49 @@
 import React, { useEffect, useState } from "react";
-import { getRecord } from "../api/kintoneService"; // Adjust the path as needed
+import { getAllRecords } from "../api/kintoneService"; // Adjust path as needed
+import "./ViewStocks.css"; // We'll create a separate CSS file for styling
 
 const ViewStocks = () => {
-  const [stocks, setStocks] = useState(null);
+  const [stocks, setStocks] = useState([]);
   const [error, setError] = useState(null);
-
-  const appId = 28;
-  const recordId = 8; // You can modify this to dynamically fetch different records
+  const appId = 29;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await getRecord(appId, recordId);
-        setStocks(data);
+        const response = await getAllRecords(appId);
+        setStocks(response.data || []);
       } catch (err) {
         setError(err.message || "Failed to fetch data");
       }
     };
     fetchData();
-  }, [appId, recordId]); // Dependency array to re-fetch when appId or recordId changes
+  }, [appId]);
 
   return (
-    <div>
+    <div className="view-stocks">
       <h2>View Stocks</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {stocks ? (
-        <pre>{JSON.stringify(stocks, null, 2)}</pre>
+      {error && <p className="error">{error}</p>}
+      {stocks.length > 0 ? (
+        <table className="stocks-table">
+          <thead>
+            <tr>
+              <th>Stock ID</th>
+              <th>Product Name</th>
+              <th>Remaining Qty</th>
+              <th>Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            {stocks.map((stock) => (
+              <tr key={stock.$id.value}>
+                <td>{stock.stockID?.value || "-"}</td>
+                <td>{stock.productName?.value || "-"}</td>
+                <td>{stock.quantity?.value || "0"} pcs</td>
+                <td>₱ {stock.price?.value || "0"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       ) : (
         <p>Loading...</p>
       )}

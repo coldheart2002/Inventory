@@ -18,6 +18,43 @@ const headers = {
   "Accept-Language": "en",
 };
 
+//GET all Records
+app.get("/api/kintone/all-records", async (req, res) => {
+  const { app } = req.query;
+
+  try {
+    const response = await axios.get(`${KINTONE_DOMAIN}/k/v1/records.json`, {
+      headers,
+      params: {
+        app,
+      },
+    });
+
+    // If records are returned, send them as a response
+    if (response.data.records && response.data.records.length > 0) {
+      console.log(response);
+      res.json({
+        status: "success",
+        data: response.data.records,
+        length: response.data.records.length,
+      });
+    } else {
+      res.status(404).json({
+        status: "error",
+        message: "No records found",
+      });
+    }
+  } catch (err) {
+    console.error(err);
+
+    res.json(err);
+    res.status(500).json({
+      status: "error",
+      message: err.response ? err.response.data : err.message,
+    });
+  }
+});
+
 // GET - Read a record based on a query (e.g., stockId = "S1245")
 app.get("/api/kintone/record", async (req, res) => {
   const { app, stockID } = req.query;

@@ -93,7 +93,7 @@ const AddStocks = () => {
             />
           </div>
           <div>
-            <label>Price:</label>
+            <label>Price: ₱</label>
             <input
               type="number"
               name="price"
@@ -102,6 +102,13 @@ const AddStocks = () => {
             />
           </div>
           <button type="submit">✅ Submit</button>
+          <button
+            type="button"
+            onClick={handleAddNewItem}
+            style={{ marginLeft: "10px" }}
+          >
+            🔄 Rescan
+          </button>
         </form>
       )}
 
