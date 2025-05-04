@@ -19,8 +19,8 @@ const WithdrawStocks = () => {
   const handleFetchRecord = async () => {
     try {
       const response = await getRecord(appId, stockID);
-
       const resRecord = response.data[0];
+
       const newRecord = {
         recordID: resRecord.$id.value,
         recordStockID: resRecord.stockID.value,
@@ -63,13 +63,33 @@ const WithdrawStocks = () => {
     setRecords(updatedRecords);
   };
 
+  const handleRemoveRecord = (index) => {
+    const confirmation = window.confirm(
+      "Are you sure you want to remove this record?"
+    );
+    if (confirmation) {
+      const updatedRecords = [...records];
+      updatedRecords.splice(index, 1);
+      setRecords(updatedRecords);
+
+      // If no records remain, go back to QR scanning
+      if (updatedRecords.length === 0) {
+        setShowScanner(true);
+      }
+    }
+  };
+
   const handleSubmit = () => {
     const dataToSubmit = records.map((rec) => ({
       recordStockID: rec.recordStockID,
       remainingQty: rec.originalQuantity - rec.withdrawQuantity,
     }));
 
-    console.log("📝 Submit Data:", JSON.stringify(dataToSubmit, null, 2));
+    console.log("📝 Records to Submit:", JSON.stringify(records, null, 2));
+    console.log(
+      "📝 Processed Submit Data:",
+      JSON.stringify(dataToSubmit, null, 2)
+    );
   };
 
   const totalPayment = records.reduce((sum, rec) => sum + rec.paymentPrice, 0);
@@ -110,6 +130,7 @@ const WithdrawStocks = () => {
                 <th>Price</th>
                 <th>Withdraw Qty</th>
                 <th>Payment Price</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -139,6 +160,21 @@ const WithdrawStocks = () => {
                     />
                   </td>
                   <td>₱ {rec.paymentPrice}</td>
+                  <td>
+                    <button
+                      onClick={() => handleRemoveRecord(index)}
+                      style={{
+                        backgroundColor: "transparent",
+                        border: "none",
+                        fontSize: "20px",
+                        cursor: "pointer",
+                        color: "black",
+                      }}
+                      title="Delete Record"
+                    >
+                      🗑️
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -151,6 +187,7 @@ const WithdrawStocks = () => {
                   Total Payment:
                 </td>
                 <td style={{ fontWeight: "bold" }}>₱ {totalPayment}</td>
+                <td></td>
               </tr>
             </tfoot>
           </table>
