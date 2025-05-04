@@ -126,7 +126,7 @@ const WithdrawStocks = () => {
               <tr>
                 <th>Stock ID</th>
                 <th>Product Name</th>
-                <th>Inventory Qty</th>
+                <th>Remaining Qty</th>
                 <th>Price</th>
                 <th>Withdraw Qty</th>
                 <th>Payment Price</th>

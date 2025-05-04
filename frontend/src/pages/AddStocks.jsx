@@ -32,10 +32,10 @@ const AddStocks = () => {
     e.preventDefault();
     try {
       const record = {
-        stockID: { value: parseInt(formData.stockID) },
+        stockID: { value: formData.stockID },
         productName: { value: formData.productName },
-        quantity: { value: formData.quantity },
-        price: { value: formData.price },
+        quantity: { value: parseInt(formData.quantity) },
+        price: { value: parseFloat(formData.price) },
       };
 
       const response = await createRecord(29, record);
