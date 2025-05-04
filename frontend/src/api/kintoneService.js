@@ -3,15 +3,23 @@ import axios from "axios";
 const API_BASE_URL = "http://localhost:3001/api/kintone"; // your proxy prefix
 
 export const getRecord = async (appId, stockID) => {
-  const response = await axios.get(`${API_BASE_URL}/record`, {
-    params: {
-      app: appId,
-      // query: `stockID = "${stockID}"` ,
+  try {
+    const response = await axios.get(`${API_BASE_URL}/api/kintone/record`, {
+      params: {
+        app: appId,
+        stockid: stockID, // Ensuring it matches the backend query params
+      },
+    });
 
-      query: `stockID="S1245"`,
-    },
-  });
-  return response.data;
+    console.log(response.data);
+
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error fetching record:",
+      error.response ? error.response.data : error.message
+    );
+  }
 };
 
 export const createRecord = async (appId, recordData) => {

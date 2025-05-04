@@ -18,7 +18,7 @@ const WithdrawStocks = () => {
 
   const handleFetchRecord = async () => {
     try {
-      const response = await getRecord(appId, stockID); // Using stockID as recordId for now
+      const response = await getRecord(appId, stockID);
       setRecord(response);
       setError(null);
     } catch (err) {

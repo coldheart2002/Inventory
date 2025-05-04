@@ -14,31 +14,44 @@ app.use(express.json());
 
 const headers = {
   "X-Cybozu-API-Token": KINTONE_TOKEN,
-  "Content-Type": "application/json",
+  // "Content-Type": "application/json",
+  "Accept-Language": "en",
 };
 
 // GET - Read a record based on a query (e.g., stockId = "S1245")
 app.get("/api/kintone/record", async (req, res) => {
-  const { app, query } = req.query;
-  console.log("App:", app, "Query:", query); // 👈 Add this for debugging
+  const { app, stockid } = req.query;
 
   try {
+    // Ensure that the query string is correctly formatted for Kintone
+    const queryString = `stockid="${stockid}"`; // Using quotes for exact match in Kintone query
+
     const response = await axios.get(`${KINTONE_DOMAIN}/k/v1/records.json`, {
-      headers,
-      params: { app, query },
+      headers, // Assuming `headers` contains the necessary authorization
+      params: {
+        app: Number(app),
+        query: queryString, // Sending the filter query
+      },
     });
 
-    const record = response.data.records[0];
-    console.log(record);
-
-    if (!record) {
-      return res.status(404).json({ error: "Record not found" });
+    // If records are returned, send them as a response
+    if (response.data.records && response.data.records.length > 0) {
+      res.json({
+        status: "success",
+        data: response.data.records,
+      });
+    } else {
+      res.status(404).json({
+        status: "error",
+        message: "No records found",
+      });
     }
-
-    // res.json(record);
   } catch (err) {
-    console.error(err.response?.data || err.message);
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({
+      status: "error",
+      message: err.response ? err.response.data : err.message,
+    });
   }
 });
 
