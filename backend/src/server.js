@@ -18,19 +18,17 @@ const headers = {
   "Accept-Language": "en",
 };
 
-// GET - Read a record based on a query (e.g., stockId = "S1245")
-app.get("/api/kintone/record", async (req, res) => {
-  const { app, stockID } = req.query;
+// Kintone get All Records
+app.get("/api/kintone/all-records", async (req, res) => {
+  const { app } = req.query;
 
   try {
-    // Ensure that the query string is correctly formatted for Kintone
-    const queryString = `stockID="${stockID}"`; // Using quotes for exact match in Kintone query
-
+    // Ensure no filtering in the query string (retrieving all records)
     const response = await axios.get(`${KINTONE_DOMAIN}/k/v1/records.json`, {
       headers, // Assuming `headers` contains the necessary authorization
       params: {
-        app: Number(app),
-        query: queryString, // Sending the filter query
+        app: parseInt(app),
+        query: "", // Empty query retrieves all records
       },
     });
 
@@ -39,7 +37,7 @@ app.get("/api/kintone/record", async (req, res) => {
       console.log(response);
       res.json({
         status: "success",
-        data: response.data.records, //get the first
+        data: response.data.records, // All records
       });
     } else {
       res.status(303).json({
@@ -52,6 +50,42 @@ app.get("/api/kintone/record", async (req, res) => {
     res.status(500).json({
       status: "error",
       message: err.response ? err.response.data : err.message,
+    });
+  }
+});
+
+// GET - Read a record based on a query (e.g., stockId = "S1245")
+app.get("/api/kintone/record", async (req, res) => {
+  const { app, stockID } = req.query;
+
+  try {
+    const queryString = `stockID="${stockID}"`;
+
+    const response = await axios.get(`${KINTONE_DOMAIN}/k/v1/records.json`, {
+      headers,
+      params: {
+        app: Number(app),
+        query: queryString,
+      },
+    });
+
+    if (response.data.records && response.data.records.length > 0) {
+      res.json({
+        status: "success",
+        data: response.data.records[0], // Return the first record if needed
+      });
+    } else {
+      res.status(404).json({
+        status: "error",
+        message: "No records found",
+      });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      status: "error",
+      message:
+        "An error occurred while fetching the record. Please try again later.",
     });
   }
 });

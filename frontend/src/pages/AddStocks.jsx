@@ -1,12 +1,15 @@
 import React, { useState } from "react";
 import Scanner from "../components/Scanner";
 import { createRecord } from "../api/kintoneService";
+import { appID } from "../config";
 
 const AddStocks = () => {
   const [showScanner, setShowScanner] = useState(true);
   const [formData, setFormData] = useState(null);
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
+
+  const appId = appID;
 
   const handleScanComplete = (result) => {
     console.log("✅ Add Stocks - Scanned:", result);
@@ -38,7 +41,7 @@ const AddStocks = () => {
         price: { value: formData.price },
       };
 
-      const response = await createRecord(29, record);
+      const response = await createRecord(appID, record);
       setSuccessMessage(`✅ Stock added successfully (ID: ${response.id})`);
       setError(null);
       setFormData(null);

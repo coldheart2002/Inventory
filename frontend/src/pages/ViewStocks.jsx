@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { getRecord } from "../api/kintoneService"; // Adjust the path as needed
+import { getAllRecords } from "../api/kintoneService"; // Adjust the path as needed
+import { appID } from "../config";
 
 const ViewStocks = () => {
   const [stocks, setStocks] = useState(null);
   const [error, setError] = useState(null);
 
-  const appId = 28;
-  const recordId = 8; // You can modify this to dynamically fetch different records
+  const appId = appID;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await getRecord(appId, recordId);
+        const data = await getAllRecords(appId);
         setStocks(data);
       } catch (err) {
         setError(err.message || "Failed to fetch data");

@@ -2,6 +2,23 @@ import axios from "axios";
 
 const API_BASE_URL = "http://localhost:3001/api/kintone"; // your proxy prefix
 
+export const getAllRecords = async (appId) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/all-records`, {
+      params: {
+        app: appId,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error fetching all records:",
+      error.response ? error.response.data : error.message
+    );
+  }
+};
+
 export const getRecord = async (appId, stockID) => {
   try {
     const response = await axios.get(`${API_BASE_URL}/record`, {
@@ -11,12 +28,17 @@ export const getRecord = async (appId, stockID) => {
       },
     });
 
-    return response.data;
+    if (response && response.data) {
+      return response.data;
+    } else {
+      throw new Error("No data returned");
+    }
   } catch (error) {
     console.error(
       "Error fetching record:",
       error.response ? error.response.data : error.message
     );
+    return null; // Fallback in case of error
   }
 };
 

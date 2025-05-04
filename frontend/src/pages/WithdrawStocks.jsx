@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Scanner from "../components/Scanner";
 import { getRecord } from "../api/kintoneService";
+import { appID } from "../config";
 
 const WithdrawStocks = () => {
   const [showScanner, setShowScanner] = useState(true);
@@ -8,7 +9,7 @@ const WithdrawStocks = () => {
   const [records, setRecords] = useState([]);
   const [error, setError] = useState(null);
 
-  const appId = 29;
+  const appId = appID;
 
   const handleScanComplete = (result) => {
     console.log("🧾 Scanned Stock ID:", result);
@@ -86,10 +87,10 @@ const WithdrawStocks = () => {
     }));
 
     console.log("📝 Records to Submit:", JSON.stringify(records, null, 2));
-    console.log(
-      "📝 Processed Submit Data:",
-      JSON.stringify(dataToSubmit, null, 2)
-    );
+    // console.log(
+    //   "📝 Processed Submit Data:",
+    //   JSON.stringify(dataToSubmit, null, 2)
+    // );
   };
 
   const totalPayment = records.reduce((sum, rec) => sum + rec.paymentPrice, 0);
