@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@kintone/customize-uploader": "^8.0.13"
+  }
+}
