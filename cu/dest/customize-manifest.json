@@ -2,7 +2,7 @@
   "app": "32",
   "scope": "ALL",
   "desktop": {
-    "js": ["./dest/desktop/js/app.js"],
+    "js": ["./dest/desktop/js/addProduct.js"],
     "css": []
   },
   "mobile": {

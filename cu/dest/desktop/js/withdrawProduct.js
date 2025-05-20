@@ -1,16 +1,8 @@
 (function () {
   "use strict";
 
-  // === Function for Create Success ===
-  function handleCreateSuccess(event) {
+  function updateProductQuantity(event) {
     const record = event.record;
-    const currentAppId = kintone.app.getId(); // Get current app ID
-
-    // Only proceed if app ID is 31 or 32
-    if (currentAppId !== 31 && currentAppId !== 32) {
-      return event; // Do nothing
-    }
-
     const additionalProductID = record.additionalProductID.value;
     const additionalNewQuantity = Number(record.additionalQuantity.value);
 
@@ -25,6 +17,7 @@
       query: `productID = "${additionalProductID}"`,
     };
 
+    // First: Search the product by productID
     return kintone
       .api(kintone.api.url("/k/v1/records", true), "GET", params)
       .then((resp) => {
@@ -34,17 +27,13 @@
           alert(
             `No records found in App 30 for productId "${additionalProductID}".`
           );
-          return Promise.reject("No matching record found!");
+          return Promise.reject("No matching record found.");
         }
 
         const productDetails = matchingRecords[0];
         const productRecordID = Number(productDetails.$id.value);
         const productQuantity = Number(productDetails.productQuantity.value);
-
-        const updatedQuantity =
-          currentAppId === 32
-            ? productQuantity + additionalNewQuantity
-            : productQuantity - additionalNewQuantity;
+        const updatedQuantity = productQuantity - additionalNewQuantity;
 
         const updateParams = {
           app: productDatabaseID,
@@ -54,6 +43,7 @@
           },
         };
 
+        // Second: Update the quantity
         return kintone.api(
           kintone.api.url("/k/v1/record", true),
           "PUT",
@@ -61,12 +51,12 @@
         );
       })
       .then((updateResp) => {
-        console.log("Product quantity updated:", updateResp);
+        console.log("Update response:", updateResp);
         alert("Product Database updated successfully!");
         return event;
       })
       .catch((error) => {
-        console.error("Update error:", error);
+        console.error("Update failed:", error);
         alert(
           "Error updating product quantity:\n" + JSON.stringify(error, null, 2)
         );
@@ -74,14 +64,9 @@
       });
   }
 
-  // === Function for Edit Success ===
-  function handleEditSuccess(event) {
-    alert("Record edit successful — you can run another function here.");
-    // Do something else here
-    return event;
-  }
-
-  // Register events
-  kintone.events.on("app.record.create.submit.success", handleCreateSuccess);
-  kintone.events.on("app.record.edit.submit.success", handleEditSuccess);
+  // Register for both create and edit success events
+  kintone.events.on(
+    ["app.record.create.submit.success", "app.record.edit.submit.success"],
+    updateProductQuantity
+  );
 })();

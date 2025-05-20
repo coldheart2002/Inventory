@@ -55,8 +55,8 @@ app.get("/api/kintone/all-records", async (req, res) => {
   }
 });
 
-// GET - Read a record based on a query (e.g., stockId = "S1245")
-app.get("/api/kintone/record", async (req, res) => {
+// GET - Read records based on a query (e.g., stockId = "S1245")
+app.get("/api/kintone/get-records", async (req, res) => {
   const { app, stockID } = req.query;
 
   try {

@@ -79,17 +79,33 @@ const WithdrawStocks = () => {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const dataToSubmit = records.map((rec) => ({
       recordStockID: rec.recordStockID,
       remainingQty: rec.originalQuantity - rec.withdrawQuantity,
     }));
 
-    console.log("📝 Records to Submit:", JSON.stringify(records, null, 2));
+    // console.log("📝 Records to Submit:", JSON.stringify(records, null, 2));
+
     // console.log(
     //   "📝 Processed Submit Data:",
     //   JSON.stringify(dataToSubmit, null, 2)
     // );
+
+    // GET then PUT
+
+    const stockIDs = dataToSubmit.map((rec) => `"${rec.recordStockID}"`);
+
+    try {
+      const getRecordBody = {
+        query: `stockID in (${stockIDs.join(", ")})`,
+        fields: ["$id", "stockID", "quantity", "productName"],
+      };
+
+      const reponse = await getRecord();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const totalPayment = records.reduce((sum, rec) => sum + rec.paymentPrice, 0);

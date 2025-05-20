@@ -21,14 +21,17 @@ export const getAllRecords = async (appId) => {
 };
 
 //get a record based on stockid
-export const getRecord = async (appId, stockID) => {
+export const getRecord = async () => {
+  const params = {
+    app: 29,
+    query: 'stockID in ("8080", "S1245")',
+    fields: ["$id", "stockID", "quantity", "productName"],
+  };
+
   try {
-    const response = await axios.get(`${API_BASE_URL}/record`, {
-      params: {
-        app: appId,
-        stockID,
-      },
-    });
+    const response = await axios.post(`${API_BASE_URL}/record`, params);
+
+    console.log(response);
 
     return response.data;
   } catch (error) {
