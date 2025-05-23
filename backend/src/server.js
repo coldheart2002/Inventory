@@ -5,7 +5,7 @@ const cors = require("cors");
 const app = express();
 const PORT = 3001;
 
-// Replace this with your actual Kintone API token and domain
+// Replace with your actual Kintone API token and domain
 const KINTONE_DOMAIN = "https://demo-cebu.kintone.com";
 const KINTONE_TOKEN = "IOIkT9gjxEASsHXZyhVBfPm7c7kqAFJ0xTOeXdbn";
 
@@ -14,38 +14,31 @@ app.use(express.json());
 
 const headers = {
   "X-Cybozu-API-Token": KINTONE_TOKEN,
-  // "Content-Type": "application/json",
   "Accept-Language": "en",
 };
 
-//GET all Records
+// GET all records
 app.get("/api/kintone/all-records", async (req, res) => {
   const { app } = req.query;
 
   try {
     const response = await axios.get(`${KINTONE_DOMAIN}/k/v1/records.json`, {
       headers,
-      params: {
-        app,
-      },
+      params: { app },
     });
 
-    // If records are returned, send them as a response
     if (response.data.records && response.data.records.length > 0) {
-      console.log(response);
+      console.log("All records response:", response.data);
       res.json({
         status: "success",
         data: response.data.records,
         length: response.data.records.length,
       });
     } else {
-      res.status(404).json({
-        status: "error",
-        message: "No records found",
-      });
+      res.status(404).json({ status: "error", message: "No records found" });
     }
   } catch (err) {
-    console.error(err);
+    console.error("Error in all-records:", err);
     res.status(500).json({
       status: "error",
       message: err.response ? err.response.data : err.message,
@@ -53,49 +46,46 @@ app.get("/api/kintone/all-records", async (req, res) => {
   }
 });
 
+// GET a single record by stockID
 app.get("/api/kintone/record", async (req, res) => {
   const { app, stockID } = req.query;
 
   try {
-    // Ensure that the query string is correctly formatted for Kintone
-    const queryString = `stockID="${stockID}"`; // Using quotes for exact match in Kintone query
+    const queryString = `stockID="${stockID}"`; // exact match query
 
     const response = await axios.get(`${KINTONE_DOMAIN}/k/v1/records.json`, {
-      headers, // Assuming `headers` contains the necessary authorization
+      headers,
       params: {
         app: Number(app),
-        query: queryString, // Sending the filter query
+        query: queryString,
       },
     });
 
-    // If records are returned, send them as a response
     if (response.data.records && response.data.records.length > 0) {
-      console.log(response);
+      console.log("Single record response:", response.data);
       res.json({
         status: "success",
-        data: response.data.records, //get the first
+        data: response.data.records,
       });
     } else {
-      res.status(404).json({
-        status: "error",
-        message: "No records found",
-      });
+      res.status(404).json({ status: "error", message: "No records found" });
     }
   } catch (err) {
-    console.error(err);
+    console.error("Error in record:", err);
     res.status(500).json({
       status: "error",
       message: err.response ? err.response.data : err.message,
     });
   }
 });
-// GET - Read records based on a query (e.g., stockId = "S1245")
+
+// GET multiple records based on array of stockIDs
 app.get("/api/kintone/get-records", async (req, res) => {
   const { app, stockIdArray } = req.query;
 
   try {
-    // Ensure that the query string is correctly formatted for Kintone (map array)
     let query = "";
+
     if (stockIdArray) {
       const stockIDs = JSON.parse(stockIdArray);
       query = `stockID in (${stockIDs.map((id) => `"${id}"`).join(", ")})`;
@@ -105,28 +95,22 @@ app.get("/api/kintone/get-records", async (req, res) => {
       headers,
       params: {
         app,
-        query: "",
-        // query: `stockID in ("8080", "S1245", "6655")`,
-        // fields: ["$id", "stockID", "quantity", "productName"],
+        query, // <-- PASS THE QUERY STRING HERE
       },
     });
 
-    // If records are returned, send them as a response
     if (response.data.records && response.data.records.length > 0) {
-      console.log(response);
+      console.log("Multiple records response:", response.data);
       res.json({
         status: "success",
         data: response.data.records,
         length: response.data.records.length,
       });
     } else {
-      res.status(404).json({
-        status: "error",
-        message: "No records found",
-      });
+      res.status(404).json({ status: "error", message: "No records found" });
     }
   } catch (err) {
-    console.error(err);
+    console.error("Error in get-records:", err);
     res.status(500).json({
       status: "error",
       message: err.response ? err.response.data : err.message,
@@ -140,12 +124,11 @@ app.post("/api/kintone/record", async (req, res) => {
     const response = await axios.post(
       `${KINTONE_DOMAIN}/k/v1/record.json`,
       req.body,
-      {
-        headers,
-      }
+      { headers }
     );
     res.json(response.data);
   } catch (err) {
+    console.error("Error in create record:", err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -156,12 +139,11 @@ app.put("/api/kintone/record", async (req, res) => {
     const response = await axios.put(
       `${KINTONE_DOMAIN}/k/v1/record.json`,
       req.body,
-      {
-        headers,
-      }
+      { headers }
     );
     res.json(response.data);
   } catch (err) {
+    console.error("Error in update record:", err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -175,6 +157,7 @@ app.delete("/api/kintone/record", async (req, res) => {
     });
     res.json(response.data);
   } catch (err) {
+    console.error("Error in delete record:", err);
     res.status(500).json({ error: err.message });
   }
 });

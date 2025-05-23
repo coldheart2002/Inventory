@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import Scanner from "../components/Scanner";
-import { getRecord, getRecordUsingFieldCode } from "../api/kintoneService";
+import {
+  getRecordUsingFieldCode,
+  updateRecord,
+  getRecord,
+} from "../api/kintoneService";
 
 const WithdrawStocks = () => {
   const [showScanner, setShowScanner] = useState(true);
@@ -19,17 +23,26 @@ const WithdrawStocks = () => {
   const handleFetchRecord = async () => {
     try {
       const response = await getRecord(appId, stockID);
-      const resRecord = response.data[0];
+      console.log("API response:", response);
+
+      if (!response.data || response.data.length === 0) {
+        setError("No record found for this Stock ID");
+        return;
+      }
+
+      const resRecord = Array.isArray(response.data)
+        ? response.data[0]
+        : response.data;
 
       const newRecord = {
-        recordID: resRecord.$id.value,
-        recordStockID: resRecord.stockID.value,
-        recordProductName: resRecord.productName.value,
-        recordQuantity: resRecord.quantity.value,
-        recordPrice: resRecord.price.value,
+        recordID: resRecord?.$id?.value || "",
+        recordStockID: resRecord?.stockID?.value || "",
+        recordProductName: resRecord?.productName?.value || "",
+        recordQuantity: resRecord?.quantity?.value || 0,
+        recordPrice: resRecord?.price?.value || 0,
         withdrawQuantity: 1,
-        paymentPrice: resRecord.price.value * 1,
-        originalQuantity: resRecord.quantity.value,
+        paymentPrice: (resRecord?.price?.value || 0) * 1,
+        originalQuantity: resRecord?.quantity?.value || 0,
       };
 
       setRecords((prev) => [...prev, newRecord]);
@@ -72,44 +85,71 @@ const WithdrawStocks = () => {
       updatedRecords.splice(index, 1);
       setRecords(updatedRecords);
 
-      // If no records remain, go back to QR scanning
       if (updatedRecords.length === 0) {
         setShowScanner(true);
       }
     }
   };
 
+  const totalPayment = records.reduce((sum, rec) => sum + rec.paymentPrice, 0);
+
+  // NOTE: Implement your submit logic here!
   const handleSubmit = async () => {
-    const dataToSubmit = records.map((rec) => ({
-      recordStockID: rec.recordStockID,
-      remainingQty: rec.originalQuantity - rec.withdrawQuantity,
-    }));
-
-    // console.log("📝 Records to Submit:", JSON.stringify(records, null, 2));
-
-    // console.log(
-    //   "📝 Processed Submit Data:",
-    //   JSON.stringify(dataToSubmit, null, 2)
-    // );
-
-    // GET then PUT
-
-    const stockIDs = dataToSubmit.map((rec) => `"${rec.recordStockID}"`);
+    const stockIDs = records.map((rec) => rec.recordStockID);
+    console.log("Submitting withdrawal for stock IDs:", stockIDs);
 
     try {
-      const getRecordBody = {
-        query: `stockID in (${stockIDs.join(", ")})`,
-        fields: ["$id", "stockID", "quantity", "productName"],
-      };
+      // Fetch current records by stockIDs
+      const response = await getRecordUsingFieldCode(appId, stockIDs);
+      console.log("Fetched records from backend:", response);
 
-      ////=================
-      const reponse = await getRecordUsingFieldCode();
+      if (!response || !response.data) {
+        throw new Error("No data returned from getRecordUsingFieldCode");
+      }
+
+      // Update each record with new quantity
+      const updatePromises = response.data.map((record) => {
+        const localRecord = records.find(
+          (rec) => rec.recordStockID === record.stockID.value
+        );
+
+        if (!localRecord) {
+          console.warn(
+            `No local record found for stockID ${record.stockID.value}`
+          );
+          return Promise.resolve();
+        }
+
+        const newQuantity =
+          record.quantity.value - localRecord.withdrawQuantity;
+        console.log(
+          `Updating record ${record.$id.value} with new quantity ${newQuantity}`
+        );
+
+        return updateRecord(appId, record.$id.value, {
+          quantity: {
+            value: newQuantity >= 0 ? newQuantity : 0,
+          },
+        });
+      });
+
+      const results = await Promise.all(updatePromises);
+      console.log("Update results:", results);
+
+      alert("Withdrawal successful!");
+
+      setRecords([]);
+      setShowScanner(true);
+      setStockID(null);
+      setError(null);
     } catch (error) {
-      console.log(error);
+      console.error("Error during withdrawal submission:", error);
+      alert(
+        "Failed to submit withdrawal: " + (error.message || "Unknown error")
+      );
+      setError(error.message || "Unknown error");
     }
   };
-
-  const totalPayment = records.reduce((sum, rec) => sum + rec.paymentPrice, 0);
 
   return (
     <div>
@@ -132,7 +172,7 @@ const WithdrawStocks = () => {
       {error && <p style={{ color: "red" }}>{error}</p>}
 
       {records.length > 0 && (
-        <div>
+        <>
           <h3>✅ Stock Records</h3>
           <table
             border="1"
@@ -156,9 +196,7 @@ const WithdrawStocks = () => {
                   <td>{rec.recordStockID}</td>
                   <td>{rec.recordProductName}</td>
                   <td>
-                    {rec.originalQuantity - rec.withdrawQuantity < 0
-                      ? 0
-                      : rec.originalQuantity - rec.withdrawQuantity}
+                    {Math.max(rec.originalQuantity - rec.withdrawQuantity, 0)}
                     <br />
                     <span style={{ color: "red", fontSize: "12px" }}>
                       {rec.recordWarning}
@@ -223,7 +261,7 @@ const WithdrawStocks = () => {
           >
             📝 Withdraw
           </button>
-        </div>
+        </>
       )}
     </div>
   );
