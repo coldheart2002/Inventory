@@ -20,18 +20,34 @@ export const getAllRecords = async (appId) => {
   }
 };
 
-//get a record based on stockid
-export const getRecord = async () => {
-  const params = {
-    app: 29,
-    query: 'stockID in ("8080", "S1245")',
-    fields: ["$id", "stockID", "quantity", "productName"],
-  };
-
+export const getRecord = async (appId, stockID) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/record`, params);
+    const response = await axios.get(`${API_BASE_URL}/record`, {
+      params: {
+        app: appId,
+        stockID,
+      },
+    });
 
-    console.log(response);
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error fetching record:",
+      error.response ? error.response.data : error.message
+    );
+  }
+};
+
+//get a record based on stockid
+export const getRecordUsingFieldCode = async (appId, stockID) => {
+  console.log("object");
+  try {
+    const response = await axios.get(`${API_BASE_URL}/get-records`, {
+      params: {
+        app: Number(29),
+        stockIdArray: ["8080", "S1245", "6655"],
+      },
+    });
 
     return response.data;
   } catch (error) {

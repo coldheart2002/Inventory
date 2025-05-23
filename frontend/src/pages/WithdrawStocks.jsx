@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Scanner from "../components/Scanner";
-import { getRecord } from "../api/kintoneService";
+import { getRecord, getRecordUsingFieldCode } from "../api/kintoneService";
 
 const WithdrawStocks = () => {
   const [showScanner, setShowScanner] = useState(true);
@@ -102,7 +102,8 @@ const WithdrawStocks = () => {
         fields: ["$id", "stockID", "quantity", "productName"],
       };
 
-      const reponse = await getRecord();
+      ////=================
+      const reponse = await getRecordUsingFieldCode();
     } catch (error) {
       console.log(error);
     }

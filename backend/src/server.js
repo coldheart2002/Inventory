@@ -46,8 +46,6 @@ app.get("/api/kintone/all-records", async (req, res) => {
     }
   } catch (err) {
     console.error(err);
-
-    res.json(err);
     res.status(500).json({
       status: "error",
       message: err.response ? err.response.data : err.message,
@@ -55,8 +53,7 @@ app.get("/api/kintone/all-records", async (req, res) => {
   }
 });
 
-// GET - Read records based on a query (e.g., stockId = "S1245")
-app.get("/api/kintone/get-records", async (req, res) => {
+app.get("/api/kintone/record", async (req, res) => {
   const { app, stockID } = req.query;
 
   try {
@@ -79,7 +76,51 @@ app.get("/api/kintone/get-records", async (req, res) => {
         data: response.data.records, //get the first
       });
     } else {
-      res.status(303).json({
+      res.status(404).json({
+        status: "error",
+        message: "No records found",
+      });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      status: "error",
+      message: err.response ? err.response.data : err.message,
+    });
+  }
+});
+// GET - Read records based on a query (e.g., stockId = "S1245")
+app.get("/api/kintone/get-records", async (req, res) => {
+  const { app, stockIdArray } = req.query;
+
+  try {
+    // Ensure that the query string is correctly formatted for Kintone (map array)
+    let query = "";
+    if (stockIdArray) {
+      const stockIDs = JSON.parse(stockIdArray);
+      query = `stockID in (${stockIDs.map((id) => `"${id}"`).join(", ")})`;
+    }
+
+    const response = await axios.get(`${KINTONE_DOMAIN}/k/v1/records.json`, {
+      headers,
+      params: {
+        app,
+        query: "",
+        // query: `stockID in ("8080", "S1245", "6655")`,
+        // fields: ["$id", "stockID", "quantity", "productName"],
+      },
+    });
+
+    // If records are returned, send them as a response
+    if (response.data.records && response.data.records.length > 0) {
+      console.log(response);
+      res.json({
+        status: "success",
+        data: response.data.records,
+        length: response.data.records.length,
+      });
+    } else {
+      res.status(404).json({
         status: "error",
         message: "No records found",
       });
