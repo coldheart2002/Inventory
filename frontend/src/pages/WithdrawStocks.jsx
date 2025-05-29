@@ -5,6 +5,7 @@ import {
   updateRecord,
   getRecord,
 } from "../api/kintoneService";
+import "./WithdrawStocks.css";
 
 const WithdrawStocks = () => {
   const [showScanner, setShowScanner] = useState(true);
@@ -43,6 +44,7 @@ const WithdrawStocks = () => {
         withdrawQuantity: 1,
         paymentPrice: (resRecord?.price?.value || 0) * 1,
         originalQuantity: resRecord?.quantity?.value || 0,
+        recordWarning: "",
       };
 
       setRecords((prev) => [...prev, newRecord]);
@@ -93,13 +95,11 @@ const WithdrawStocks = () => {
 
   const totalPayment = records.reduce((sum, rec) => sum + rec.paymentPrice, 0);
 
-  // NOTE: Implement your submit logic here!
   const handleSubmit = async () => {
     const stockIDs = records.map((rec) => rec.recordStockID);
     console.log("Submitting withdrawal for stock IDs:", stockIDs);
 
     try {
-      // Fetch current records by stockIDs
       const response = await getRecordUsingFieldCode(appId, stockIDs);
       console.log("Fetched records from backend:", response);
 
@@ -107,7 +107,6 @@ const WithdrawStocks = () => {
         throw new Error("No data returned from getRecordUsingFieldCode");
       }
 
-      // Update each record with new quantity
       const updatePromises = response.data.map((record) => {
         const localRecord = records.find(
           (rec) => rec.recordStockID === record.stockID.value
@@ -152,33 +151,33 @@ const WithdrawStocks = () => {
   };
 
   return (
-    <div>
+    <div className="withdraw-stocks">
       <h2>Withdraw Stocks</h2>
 
-      {showScanner && <Scanner onScan={handleScanComplete} />}
+      {showScanner && (
+        <div className="scanner-container">
+          <Scanner onScan={handleScanComplete} />
+        </div>
+      )}
 
       {stockID && (
-        <div>
+        <div className="stock-info">
           <p>
             📦 Scanned Stock ID: <strong>{stockID}</strong>
           </p>
           <button onClick={handleFetchRecord}>🔍 Get Stock Info</button>
-          <button onClick={handleRescan} style={{ marginLeft: "10px" }}>
+          <button onClick={handleRescan} className="rescan-button">
             🔄 Rescan
           </button>
         </div>
       )}
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && <p className="error-message">{error}</p>}
 
       {records.length > 0 && (
         <>
           <h3>✅ Stock Records</h3>
-          <table
-            border="1"
-            cellPadding="10"
-            style={{ borderCollapse: "collapse", width: "100%" }}
-          >
+          <table>
             <thead>
               <tr>
                 <th>Stock ID</th>
@@ -198,9 +197,7 @@ const WithdrawStocks = () => {
                   <td>
                     {Math.max(rec.originalQuantity - rec.withdrawQuantity, 0)}
                     <br />
-                    <span style={{ color: "red", fontSize: "12px" }}>
-                      {rec.recordWarning}
-                    </span>
+                    <span className="warning-text">{rec.recordWarning}</span>
                   </td>
                   <td>₱ {rec.recordPrice}</td>
                   <td>
@@ -211,20 +208,14 @@ const WithdrawStocks = () => {
                       onChange={(e) =>
                         handleWithdrawChange(index, e.target.value)
                       }
-                      style={{ width: "80px" }}
+                      className="withdraw-input"
                     />
                   </td>
                   <td>₱ {rec.paymentPrice}</td>
                   <td>
                     <button
                       onClick={() => handleRemoveRecord(index)}
-                      style={{
-                        backgroundColor: "transparent",
-                        border: "none",
-                        fontSize: "20px",
-                        cursor: "pointer",
-                        color: "black",
-                      }}
+                      className="delete-button"
                       title="Delete Record"
                     >
                       🗑️
@@ -235,30 +226,20 @@ const WithdrawStocks = () => {
             </tbody>
             <tfoot>
               <tr>
-                <td
-                  colSpan="5"
-                  style={{ textAlign: "right", fontWeight: "bold" }}
-                >
+                <td colSpan="5" className="total-label">
                   Total Payment:
                 </td>
-                <td style={{ fontWeight: "bold" }}>₱ {totalPayment}</td>
+                <td className="total-value">₱ {totalPayment}</td>
                 <td></td>
               </tr>
             </tfoot>
           </table>
 
-          <button onClick={handleRescan} style={{ marginTop: "10px" }}>
+          <button onClick={handleRescan} className="add-stock-button">
             ➕ Add Another Stock
           </button>
 
-          <button
-            onClick={handleSubmit}
-            style={{
-              marginTop: "10px",
-              backgroundColor: "green",
-              color: "white",
-            }}
-          >
+          <button onClick={handleSubmit} className="withdraw">
             📝 Withdraw
           </button>
         </>

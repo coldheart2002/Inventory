@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Scanner from "../components/Scanner";
 import { createRecord } from "../api/kintoneService";
+import "./AddStocks.css";
 
 const AddStocks = () => {
   const [showScanner, setShowScanner] = useState(true);
@@ -56,64 +57,79 @@ const AddStocks = () => {
   };
 
   return (
-    <div>
-      <h2>Add Stocks</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
+    <div className="addstocks-container">
+      <h2 className="page-title">Add Stocks</h2>
+
+      {error && <p className="message error">{error}</p>}
+      {successMessage && <p className="message success">{successMessage}</p>}
 
       {showScanner && <Scanner onScan={handleScanComplete} />}
 
       {!showScanner && formData && (
-        <form onSubmit={handleSubmit}>
-          <div>
-            <label>Stock ID:</label>
+        <form className="stock-form" onSubmit={handleSubmit}>
+          <label>
+            Stock ID:
             <input
               type="text"
               name="stockID"
               value={formData.stockID}
               onChange={handleInputChange}
+              required
+              autoFocus
             />
-          </div>
-          <div>
-            <label>Product Name:</label>
+          </label>
+          <label>
+            Product Name:
             <input
               type="text"
               name="productName"
               value={formData.productName}
               onChange={handleInputChange}
+              required
             />
-          </div>
-          <div>
-            <label>Quantity:</label>
+          </label>
+          <label>
+            Quantity:
             <input
               type="number"
               name="quantity"
+              min="0"
               value={formData.quantity}
               onChange={handleInputChange}
+              required
             />
-          </div>
-          <div>
-            <label>Price: ₱</label>
+          </label>
+          <label>
+            Price: ₱
             <input
               type="number"
               name="price"
+              min="0"
+              step="0.01"
               value={formData.price}
               onChange={handleInputChange}
+              required
             />
+          </label>
+          <div className="button-row">
+            <button type="submit" className="btn primary">
+              ✅ Submit
+            </button>
+            <button
+              type="button"
+              onClick={handleAddNewItem}
+              className="btn secondary"
+            >
+              🔄 Rescan
+            </button>
           </div>
-          <button type="submit">✅ Submit</button>
-          <button
-            type="button"
-            onClick={handleAddNewItem}
-            style={{ marginLeft: "10px" }}
-          >
-            🔄 Rescan
-          </button>
         </form>
       )}
 
       {!showScanner && !formData && (
-        <button onClick={handleAddNewItem}>➕ Add New Item</button>
+        <button onClick={handleAddNewItem} className="btn primary add-new">
+          ➕ Add New Item
+        </button>
       )}
     </div>
   );

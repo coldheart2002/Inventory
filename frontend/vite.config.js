@@ -5,11 +5,10 @@ import fs from "fs";
 export default defineConfig({
   plugins: [react()],
   server: {
-    host: "0.0.0.0",
-    port: 5173,
+    port: 5050,
     // https: {
-    //   key: fs.readFileSync("./certs/cert.key"),
-    //   cert: fs.readFileSync("./certs/cert.crt"),
+    //   key: "./inventorymanagement-privateKey.key",
+    //   cert: "./inventorymanagement.crt",
     // },
   },
 });

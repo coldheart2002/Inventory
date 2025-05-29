@@ -1,0 +1,146 @@
+:root {
+  --bg-color: #1e1e1e;
+  --text-color: #eee;
+  --primary-color: #4caf50; /* green */
+  --error-color: #e53935;
+  --button-bg: #333;
+  --button-hover-bg: #555;
+  --table-header-bg: #333;
+  --table-row-bg: #222;
+  --table-border-color: #444;
+  --input-bg: #2c2c2c;
+  --input-border: #555;
+}
+
+body,
+#root,
+.withdraw-stocks {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.withdraw-stocks h2,
+.withdraw-stocks h3 {
+  color: var(--primary-color);
+  margin-bottom: 15px;
+}
+
+.scanner-container {
+  background-color: #121212;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 400px;
+  margin: 0 auto 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+}
+
+.stock-info {
+  margin: 10px 0 20px;
+}
+
+button {
+  background-color: var(--button-bg);
+  color: var(--text-color);
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 1rem;
+}
+
+button:hover {
+  background-color: var(--button-hover-bg);
+}
+
+button.withdraw {
+  background-color: var(--primary-color);
+  color: #fff;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+button.withdraw:hover {
+  background-color: #388e3c;
+}
+
+button.rescan-button {
+  margin-left: 10px;
+}
+
+button.add-stock-button {
+  margin-top: 10px;
+  margin-right: 10px;
+}
+
+.error-message {
+  color: var(--error-color);
+  margin: 10px 0;
+  font-weight: 600;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  background-color: var(--table-row-bg);
+  color: var(--text-color);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+thead tr {
+  background-color: var(--table-header-bg);
+}
+
+th,
+td {
+  padding: 10px;
+  border: 1px solid var(--table-border-color);
+  text-align: left;
+}
+
+.withdraw-input {
+  width: 80px;
+  background-color: var(--input-bg);
+  border: 1px solid var(--input-border);
+  color: var(--text-color);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 1rem;
+}
+
+.delete-button {
+  background-color: transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: var(--text-color);
+  transition: color 0.3s ease;
+}
+
+.delete-button:hover {
+  color: var(--error-color);
+}
+
+.warning-text {
+  color: #ffab00;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.total-label {
+  text-align: right;
+  font-weight: 700;
+  font-size: 1.1rem;
+  padding-right: 20px;
+}
+
+.total-value {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--primary-color);
+}
